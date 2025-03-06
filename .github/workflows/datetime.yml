@@ -1,38 +1,34 @@
-name: 🍒 Upload and Release Python Package
+name: 🍒 Infinite Loop Workflow
 
 on:
   push:
     branches:
       - main
-  release:
-    types: [published]
 
 permissions:
   contents: write
   packages: write
 
 jobs:
-  deploy:
+  loop:
     runs-on: ubuntu-latest
     steps:
-    - name: 🍊 😺 Checkout repository
-      uses: actions/checkout@v4
+      - name: 🍊 😺 Checkout repository
+        uses: actions/checkout@v4
 
-    - name: 🐸 DateTime
-      run: date >> datetime.txt
+      - name: 🕒 Update timestamp
+        run: date >> datetime.txt
 
-    - name: Get current date-time
-      run: echo "COMMIT_MESSAGE=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
-  
-    - name: 💾 Git Auto Commit
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: ${{ env.COMMIT_MESSAGE }}
-        
+      - name: Get current date-time
+        run: echo "COMMIT_MESSAGE=Loop $(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
 
+      - name: 💾 Git Auto Commit & Push
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: ${{ env.COMMIT_MESSAGE }}
 
-
-
-
-
-      
+      - name: 🔄 Trigger next run
+        run: |
+          gh workflow run "🍒 Infinite Loop Workflow" -R $GITHUB_REPOSITORY
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
